@@ -3,7 +3,7 @@ from typing import Union
 import cv2
 
 class Stream():
-    def __init__(self, stream_id: Union[str, int], desired_fps: int) -> None:
+    def __init__(self, stream_id: Union[str, int], desired_fps: int = None) -> None:
         self.stream_id = stream_id
         self._cap = cv2.VideoCapture(self.stream_id)
 
@@ -31,10 +31,14 @@ class Stream():
             raise FileNotFoundError("stream probably not found")
 
         self.fps = round(count / (time() - start), 2)
-        self.extract_freq = int(self.fps / self.desired_fps)
 
-        if self.extract_freq == 0:
-            raise ValueError("desired_fps is higher than the stream fps")
+        if self.desired_fps is None:
+            self.extract_freq = 1
+        else:
+            self.extract_freq = int(self.fps / self.desired_fps)
+
+            if self.extract_freq == 0:
+                raise ValueError("desired_fps is higher than the stream fps")
 
     _count = 0
     def read(self):

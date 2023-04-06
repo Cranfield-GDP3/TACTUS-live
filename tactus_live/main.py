@@ -15,9 +15,9 @@ import cv2
 def main(computing_device: str):
     model_yolov7 = Yolov7(skeletonization.MODEL_WEIGHTS_PATH, computing_device)
     deepsort_tracker = DeepSort(n_init=3, max_age=5)
-    rtsp_url = get_dartec_rtsp('safeoper','hnTe-$k2x-!sZq-mWo9','trc.dartec.cranfield.ac.uk','9092')
-    producer_ip = 'trc.dartec.cranfield.ac.uk:9092'
-    topic_name = 'hildasafe01'
+    rtsp_url = get_dartec_rtsp('x','x','x','x')
+    producer_ip = 'x'
+    topic_name = 'x'
     producer = kafka_producer(producer_ip,topic_name)
 
     # Message parameters
@@ -40,6 +40,7 @@ def main(computing_device: str):
             skeletons = retracker.deepsort_track_frame(deepsort_tracker, img, skeletons)
             #preprocessing = preprocessing(skeleton)
             #prediction = predict(preprocessing)
+            prediction =1
             producer.set_json_message(EventID,
                                       prediction,
                                       f'Event : {prediction} happened at Camera n°{SensorID}',

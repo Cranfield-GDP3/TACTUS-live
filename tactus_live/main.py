@@ -19,7 +19,7 @@ import cv2
 def main():
     computing_device = "cuda:0"
     model_yolov7 = Yolov7(skeletonization.MODEL_WEIGHTS_PATH, computing_device)
-    deepsort = DeepSort(n_init=3, max_age=1)
+    deepsort = DeepSort(n_init=3, max_age=0)
     feature_tracker = FeatureTracker(deepsort, window_size=9, angles_to_compute=[])
     classifier = Classifier()
     classifier = classifier.load(Path("D:\Documents\Cranfield\GDP\TACTUS-live\\tactus_live\data\model\pickle.json"))
@@ -37,7 +37,7 @@ def main():
     YPos = "not Defined" # Long
     print("Start Stream")
     bbx = []
-    stream = Stream("D:\Documents\Cranfield\GDP\Video_for_hilda\\0_11_4.avi",target_fps=10)
+    stream = Stream("D:\Documents\Cranfield\GDP\Video_for_hilda\\GroundPOV.MP4",target_fps=10)
     fig,ax = plt.subplots()
     if not stream.isOpened():
         print("Error, cannot read stream")
@@ -45,7 +45,10 @@ def main():
     while stream.isOpened():
         ret, frame = stream.read()
         if ret is True:
-            img = resize(frame)
+
+
+            img = cv2.resize(frame,(0,0),fx= 0.33, fy = 0.33)
+            img = resize(img)
             skeletons = model_yolov7.predict_frame(img)
             if len(skeletons) == 0:
                 continue

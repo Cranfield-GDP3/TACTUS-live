@@ -3,13 +3,11 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 from tactus_yolov7 import Yolov7, resize
-from tactus_data import skeletonization
-from tactus_data import retracker
 from deep_sort_realtime.deepsort_tracker import DeepSort
 from tactus_data import skeletonization
 from tactus_model.utils.tracker import FeatureTracker
 from tactus_model.utils.classifier import Classifier
-from tactus_live.stream import Stream,get_dartec_rtsp
+from tactus_live.stream import Stream,get_rtsp
 from tactus_data.utils.visualisation import pipeline_visualisation
 from kafka_producer import kafka_producer
 import cv2
@@ -25,7 +23,7 @@ def main():
     feature_tracker = FeatureTracker(deepsort, window_size=9, angles_to_compute=[])
     classifier = Classifier()
     classifier = classifier.load(Path("D:\Documents\Cranfield\GDP\TACTUS-live\\tactus_live\data\model\pickle.json"))
-    rtsp_url = get_dartec_rtsp('x','x','x','x')
+    rtsp_url = get_rtsp('x','x','x','x')
     producer_ip = 'x'
     topic_name = 'x'
     #producer = kafka_producer(producer_ip,topic_name)
@@ -39,7 +37,7 @@ def main():
     YPos = "not Defined" # Long
     print("Start Stream")
     bbx = []
-    stream = Stream("D:\Documents\Cranfield\GDP\Video_for_hilda\\Dartect_Camera_G1.mp4",target_fps=10)
+    stream = Stream("D:\Documents\Cranfield\GDP\Video_for_hilda\\0_11_4.avi",target_fps=10)
     fig,ax = plt.subplots()
     if not stream.isOpened():
         print("Error, cannot read stream")

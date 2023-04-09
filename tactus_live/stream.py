@@ -83,3 +83,9 @@ class Stream():
     def release(self):
         """Closes video file or capturing device."""
         self._cap.release()
+
+def get_rtsp(username: str,
+                    password: str,
+                    ip: str,
+                    port: str):
+    return "rtsp://" + username + ":" + password + "@" + ip + ":" + port

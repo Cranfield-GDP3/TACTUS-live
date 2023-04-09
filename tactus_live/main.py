@@ -8,7 +8,7 @@ from tactus_data import skeletonization
 from tactus_model.utils.tracker import FeatureTracker
 from tactus_model.utils.classifier import Classifier
 from tactus_live.stream import Stream,get_rtsp
-from tactus_data.utils.visualisation import pipeline_visualisation
+from tactus_data.utils.visualisation import pipeline_visualisation, plot_predict
 from kafka_producer import kafka_producer
 import cv2
 
@@ -47,26 +47,27 @@ def main():
         if ret is True:
 
 
-            img = cv2.resize(frame,(0,0),fx= 0.33, fy = 0.33)
+            img = cv2.resize(frame,(0,0),fx= 0.5, fy = 0.5)
             img = resize(img)
             skeletons = model_yolov7.predict_frame(img)
             if len(skeletons) == 0:
                 continue
 
             feature_tracker.track_skeletons(skeletons,img)
+            for i in skeletons:
+                pipeline_visualisation(ax, i["keypoints"])
             print(feature_tracker.rolling_windows)
             for skeleton_id, (success, features) in feature_tracker.extract():
                 if not success:
                     continue
                 prediction = classifier.predict([features])
-                pipeline_visualisation(ax,skeletons[int(skeleton_id)-1]["keypoints"],prediction[0])
+                plot_predict(ax,prediction[0],skeletons[int(skeleton_id)-1]["keypoints"])
                 print(skeleton_id,prediction)
 
             img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             ax.imshow(img_rgb)
             plt.pause(0.001)
             ax.clear()
-            #bbx= skeleton_bbx(skeletons)
 
             #preprocessing = preprocessing(skeleton)
             #prediction = predict(preprocessing)

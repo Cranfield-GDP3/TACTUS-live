@@ -15,7 +15,19 @@ AVAILABLE_CLASSES = ['kicking', 'punching', 'pushing', 'neutral']
 def init_camera_live_pipeline(model_path: Path, rstp_url: str,
                               computing_device: str = "cuda:0", flag_save: bool = False):
     """
+    Initialise one live pipeline for one camera.
 
+    Parameters
+    ----------
+    model_path : Path,
+        Path where the model pickle file is located
+    rstp_url : str,
+        string of the rstp_url
+    computing_device : str,
+        name of the computing devices (GPU/CPU) the models will run on
+    flag_save : bool,
+        flag to enable saving the video to .avi format, change to True
+        to enable
     """
     # Init models
     model_yolov7 = Yolov7(skeletonization.MODEL_WEIGHTS_PATH, computing_device)

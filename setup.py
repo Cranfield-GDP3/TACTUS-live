@@ -48,6 +48,6 @@ setup(
     project_urls={
         "issues": "https://github/Cranfield-GDP3/TACTUS-live/issues",
     },
-    python_requires=">=3.9",
+    python_requires=">=3.8.10",
     install_requires=install_requires,
 )

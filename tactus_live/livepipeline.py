@@ -73,10 +73,12 @@ def init_camera_live_pipeline(model_path: Path, rstp_url: str,
             count = 0
             for track_id, (success, features) in feature_tracker.extract():
                 if track_id not in prediction_tracker:
+
                     prediction_tracker.init_track_id(track_id)
                 if not success:
                     cv2_plot(img, skeletons[count],prediction_tracker[track_id])
                     continue
+                print([features].shape())
                 prediction = classifier.predict([features])
                 if prediction[0] != 3:
                     # producer.set_json_message(EventID,

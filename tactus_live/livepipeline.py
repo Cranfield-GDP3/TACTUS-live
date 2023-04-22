@@ -32,10 +32,10 @@ def init_camera_live_pipeline(model_path: Path, rstp_url: str,
     # Init models
     model_yolov7 = Yolov7(skeletonization.MODEL_WEIGHTS_PATH, computing_device)
     deepsort = DeepSort(n_init=3, max_age=0)
-    feature_tracker = FeatureTracker(deepsort, window_size=9, angles_to_compute=[])
     prediction_tracker = PredTracker()
     classifier = Classifier()
     classifier = classifier.load(model_path)
+    feature_tracker = FeatureTracker(deepsort, window_size=classifier.window_size, angles_to_compute=classifier.angle_to_compute)
     # Init Kafka
     producer_ip = 'x'
     topic_name = 'x'
@@ -52,7 +52,7 @@ def init_camera_live_pipeline(model_path: Path, rstp_url: str,
     bbx = []
     first = True
 
-    stream = Stream(rstp_url, target_fps=10) # change direct rstp to a function loading rstp data from secret file
+    stream = Stream(rstp_url, target_fps=classifier.fps) # change direct rstp to a function loading rstp data from secret file
     if not stream.isOpened():
         print("Error, cannot read stream")
         exit()

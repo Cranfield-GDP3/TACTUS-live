@@ -21,10 +21,8 @@ def get_version(rel_path: str) -> str:
 long_description = read("README.md")
 
 install_requires = [
-    "tactus-yolov7 @ git+https://github.com/Cranfield-GDP3/yolov7.git",
     "tactus-data @ git+https://github.com/Cranfield-GDP3/tactus-data.git",
     "tactus-model @ git+https://github.com/Cranfield-GDP3/tactus-model.git",
-    "opencv-python"
 ]
 
 setup(

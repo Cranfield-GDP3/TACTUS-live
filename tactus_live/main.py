@@ -9,8 +9,6 @@ from tactus_model import FeatureTracker, Classifier, PredTracker
 from deep_sort_realtime.deepsort_tracker import DeepSort
 from deep_sort_realtime.deep_sort.track import Track
 
-from tactus_live.utils.crop_frame import crop_frame
-
 
 def main(device: str = "cuda:0"):
     # Must return a list of Skeleton with at least their bounding box
@@ -25,8 +23,9 @@ def main(device: str = "cuda:0"):
     cap = VideoCapture(r"C:\Users\marco\Downloads\img_7350 low bitrate.mp4", target_fps=10)
 
     try:
-        while (frame := cap.read()) is not None:
-            frame = cv2.resize(frame, dsize=(0, 0), fx=0.3, fy=0.3)
+        while (cap_frame := cap.read()) is not None:
+            frame_id, frame = cap_frame
+            frame = cv2.resize(frame, dsize=(0, 0), fx=0.5, fy=0.5)
 
             skeletons = pose_model.predict(frame)
 
@@ -52,14 +51,14 @@ def main(device: str = "cuda:0"):
 
                 feature_tracker.update_rolling_window(track.track_id, skeleton)
 
-                success, features = feature_tracker[track.track_id].get_features()
+                # success, features = feature_tracker[track.track_id].get_features()
 
-                if success:
-                    prediction = classifier.predict([features])
+                # if success:
+                    # prediction = classifier.predict([features])
 
-                    if prediction != "neutral":
-                        skeleton = feature_tracker.rolling_windows[track.track_id].skeleton
-                        pred_tracker.add_pred(track.track_id, prediction, skeleton)
+                    # if prediction != "neutral":
+                        # skeleton = feature_tracker.rolling_windows[track.track_id].skeleton
+                        # pred_tracker.add_pred(track.track_id, prediction, skeleton)
 
             for track_id in feature_tracker.rolling_windows:
                 skeleton = feature_tracker[track_id].skeleton
@@ -75,10 +74,12 @@ def main(device: str = "cuda:0"):
                     thickness = 2
 
                 frame = visualisation.plot_bbox(frame, skeleton, color=color, thickness=thickness, label=track_id)
-                frame = visualisation.plot_joints(frame, skeleton, color=color, thickness=thickness)
+                if not feature_tracker[track_id].is_duplicated():
+                    frame = visualisation.plot_joints(frame, skeleton, thickness=1)
 
-            cv2.imshow("-", frame)
-            cv2.waitKey(1)
+            save_dir = Path("data/visualisation")
+            save_path = save_dir / (str(frame_id) + ".jpg")
+            cv2.imwrite(str(save_path), frame)
 
     finally:
         cap.release()

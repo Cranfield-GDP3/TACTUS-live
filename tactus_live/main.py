@@ -51,14 +51,14 @@ def main(device: str = "cuda:0"):
 
                 feature_tracker.update_rolling_window(track.track_id, skeleton)
 
-                # success, features = feature_tracker[track.track_id].get_features()
+                success, features = feature_tracker[track.track_id].get_features()
 
-                # if success:
-                    # prediction = classifier.predict([features])
+                if success:
+                    prediction = classifier.predict([features])
 
-                    # if prediction != "neutral":
-                        # skeleton = feature_tracker.rolling_windows[track.track_id].skeleton
-                        # pred_tracker.add_pred(track.track_id, prediction, skeleton)
+                    if prediction != "neutral":
+                        skeleton = feature_tracker.rolling_windows[track.track_id].skeleton
+                        pred_tracker.add_pred(track.track_id, prediction, skeleton)
 
             for track_id in feature_tracker.rolling_windows:
                 skeleton = feature_tracker[track_id].skeleton

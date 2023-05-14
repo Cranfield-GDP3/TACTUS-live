@@ -1,5 +1,5 @@
 import os
-from setuptools import setup
+from setuptools import setup, find_packages
 
 
 def read(rel_path: str) -> str:
@@ -30,7 +30,7 @@ setup(
     version=get_version("tactus_live/__init__.py"),
     description="Live execution of the TACTUS project",
     long_description=long_description,
-    packages=['tactus_live'],
+    packages=find_packages(),
     classifiers=[
         "Development Status :: 5 - Beta",
         "Intended Audience :: Developers",

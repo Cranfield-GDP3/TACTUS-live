@@ -40,46 +40,41 @@ def main(device: str = "cuda:0"):
                 pred_tracker.delete_track_id(track_id)
 
             for track in tracks:
-                # if there is no skeleton update, don't classify the action
+                track_id = track.track_id
+
+                # if the track has no new information, don't classify the action
                 if track.time_since_update > 0:
                     x_left, y_top, x_right, y_bottom = track.to_ltrb()
                     new_bbox_lbrt = (x_left, y_bottom, x_right, y_top)
-                    feature_tracker.duplicate_last_entry(track.track_id, new_bbox_lbrt)
-                    continue
-
-                skeleton = track.others
-
-                feature_tracker.update_rolling_window(track.track_id, skeleton)
-
-                # do not run the action classifier if the track is not confirmed
-                if not track.is_confirmed():
-                    continue
-
-                success, features = feature_tracker[track.track_id].get_features()
-
-                if success:
-                    prediction = classifier.predict([features])
-
-                    if prediction != 3:
-                        skeleton = feature_tracker.rolling_windows[track.track_id].skeleton
-                        pred_tracker.add_pred(track.track_id, prediction, skeleton)
-
-            for track_id in feature_tracker.rolling_windows:
-                skeleton = feature_tracker[track_id].skeleton
-                label = ""
-
-                color = (0, 255, 0)  # blue
-                # if the person was violent, track it with red
-                if track_id in pred_tracker:
-                    color = (0, 0, 255)  # red
-                    label = pred_tracker[track_id]["current_label"]
-
-                if feature_tracker[track_id].is_duplicated():
-                    thickness = 1
+                    feature_tracker.duplicate_last_entry(track_id, new_bbox_lbrt)
                 else:
-                    thickness = 2
+                    skeleton = track.others
+                    feature_tracker.update_rolling_window(track_id, skeleton)
 
-                frame = visualisation.plot_bbox(frame, skeleton, color=color, thickness=thickness, label=f"{track_id}: {label}")
+                    if track.is_confirmed() and feature_tracker[track_id].is_complete():
+                        features = feature_tracker[track_id].get_features()
+
+                        prediction = classifier.predict_label([features])[0]
+
+                        if prediction != "neutral":
+                            skeleton = feature_tracker.rolling_windows[track_id].skeleton
+                            pred_tracker.add_pred(track_id, prediction, skeleton)
+
+                bbox_thickness = 2
+                if track.time_since_update > 0:
+                    bbox_thickness = 1
+
+                label = None
+                bbox_color = visualisation.GREEN
+                if not track.is_confirmed() or not feature_tracker[track_id].is_complete():
+                    bbox_color = visualisation.GREY
+                elif track_id in pred_tracker:
+                    label = pred_tracker[track_id]["current_label"]
+                    bbox_color = visualisation.RED
+
+                frame = visualisation.plot_bbox(frame, skeleton,
+                                                color=bbox_color, thickness=bbox_thickness,
+                                                label=label)
                 if not feature_tracker[track_id].is_duplicated():
                     frame = visualisation.plot_joints(frame, skeleton, thickness=2)
 

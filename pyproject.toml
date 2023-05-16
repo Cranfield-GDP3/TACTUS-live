@@ -13,7 +13,8 @@ classifiers = [
 
 dependencies = [
     "opencv-python",
-    "tactus-data>=1.1.2",
+    "confluent_kafka",
+    "tactus-data>=1.1.3",
     "tactus-model>=1.0.0",
     "tactus-deep-sort-realtime",
     "pytest",

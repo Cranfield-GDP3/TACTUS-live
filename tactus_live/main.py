@@ -4,12 +4,15 @@ from pathlib import Path
 from cProfile import Profile
 import tqdm
 
+import numpy as np
 import cv2
-from tactus_data import PosePredictionYolov8, VideoCapture
+from tactus_data import PosePredictionYolov8, VideoCapture, Skeleton
 from tactus_data import retracker, visualisation
 from tactus_model import FeatureTracker, Classifier, PredTracker
 from deep_sort_realtime.deepsort_tracker import DeepSort
 from deep_sort_realtime.deep_sort.track import Track
+
+from tactus_live.utils.kafka_producer import KafkaProducer
 
 
 def main(device: str = "cuda:0"):
@@ -23,6 +26,8 @@ def main(device: str = "cuda:0"):
     cap = VideoCapture(r"C:\Users\marco\Downloads\img_7350 low bitrate.mp4",
                        target_fps=10,
                        tqdm_progressbar=tqdm.tqdm())
+
+    kafka_producer = KafkaProducer(stream_ip="1.1.1.1", topic_name="camera1/detections", sensor_id="camera1", client_id="x")
 
     pr1 = Profile()
     pr1.enable()
@@ -60,23 +65,9 @@ def main(device: str = "cuda:0"):
                             skeleton = feature_tracker.rolling_windows[track_id].skeleton
                             pred_tracker.add_pred(track_id, prediction, skeleton)
 
-                bbox_thickness = 2
-                if track.time_since_update > 0:
-                    bbox_thickness = 1
+                            kafka_producer.send_event("violence", "violence is happening on this camera")
 
-                label = None
-                bbox_color = visualisation.GREEN
-                if not track.is_confirmed() or not feature_tracker[track_id].is_complete():
-                    bbox_color = visualisation.GREY
-                elif track_id in pred_tracker:
-                    label = pred_tracker[track_id]["current_label"]
-                    bbox_color = visualisation.RED
-
-                frame = visualisation.plot_bbox(frame, skeleton,
-                                                color=bbox_color, thickness=bbox_thickness,
-                                                label=label)
-                if not feature_tracker[track_id].is_duplicated():
-                    frame = visualisation.plot_joints(frame, skeleton, thickness=2)
+                frame = plot_skeleton(frame, skeleton, track, feature_tracker, pred_tracker)
 
             save_dir = Path("data/visualisation")
             save_path = save_dir / (str(frame_id) + ".jpg")
@@ -86,6 +77,30 @@ def main(device: str = "cuda:0"):
         pr1.disable()
         pr1.print_stats('cumtime')
         cap.release()
+
+
+def plot_skeleton(frame: np.ndarray, skeleton: Skeleton, track: Track, feature_tracker: FeatureTracker, pred_tracker: PredTracker):
+    track_id = track.track_id
+
+    bbox_thickness = 2
+    if track.time_since_update > 0:
+        bbox_thickness = 1
+
+    label = None
+    bbox_color = visualisation.GREEN
+    if not track.is_confirmed() or not feature_tracker[track_id].is_complete():
+        bbox_color = visualisation.GREY
+    elif track_id in pred_tracker:
+        label = pred_tracker[track_id]["current_label"]
+        bbox_color = visualisation.RED
+
+    frame = visualisation.plot_bbox(frame, skeleton,
+                                    color=bbox_color, thickness=bbox_thickness,
+                                    label=label)
+    if not feature_tracker[track_id].is_duplicated():
+        frame = visualisation.plot_joints(frame, skeleton, thickness=2)
+
+    return frame
 
 
 main()

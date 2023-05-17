@@ -15,7 +15,7 @@ from deep_sort_realtime.deep_sort.track import Track
 from tactus_live.utils.kafka_producer import KafkaProducer
 
 
-def main(device: str = "cuda:0"):
+def main(device: str = "cuda:0", use_kafka_logger = False):
     deepsort_tracker = DeepSort(n_init=5, max_age=10, device=device)
     pose_model = PosePredictionYolov8(Path("data/raw/models"), "yolov8m-pose.pt", device)
 
@@ -27,7 +27,8 @@ def main(device: str = "cuda:0"):
                        target_fps=10,
                        tqdm_progressbar=tqdm.tqdm())
 
-    kafka_producer = KafkaProducer(stream_ip="1.1.1.1", topic_name="camera1/detections", sensor_id="camera1", client_id="x")
+    if use_kafka_logger:
+        kafka_producer = KafkaProducer(ip_adress="1.1.1.1", topic_name="camera1/detections", sensor_id="camera1", client_id="x")
 
     pr1 = Profile()
     pr1.enable()
@@ -65,7 +66,8 @@ def main(device: str = "cuda:0"):
                             skeleton = feature_tracker.rolling_windows[track_id].skeleton
                             pred_tracker.add_pred(track_id, prediction, skeleton)
 
-                            kafka_producer.send_event("violence", "violence is happening on this camera")
+                            if use_kafka_logger:
+                                kafka_producer.send_event("violence", "violence is happening on this camera")
 
                 frame = plot_skeleton(frame, skeleton, track, feature_tracker, pred_tracker)
 

@@ -5,7 +5,17 @@ from confluent_kafka import Producer
 
 
 class KafkaProducer(Producer):
-    """extension of Producer class to send json messages more easily"""
+    """extension of Producer class to send json messages more easily.
+
+    Example
+    -------
+    ```
+    kafka_producer = KafkaProducer(ip_adress="1.1.1.1",
+                                       topic_name="camera1/detections",
+                                       sensor_id="camera1",
+                                       client_id="x")
+    ```
+    """
     def __init__(self, ip_adress: str, topic_name: str, sensor_id: str, client_id: str, log_success: bool = False):
         super().__init__({'bootstrap.servers': ip_adress,
                           'client_id': client_id})

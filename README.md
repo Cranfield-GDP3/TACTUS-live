@@ -4,7 +4,7 @@
 
 ## Useful ressources
 
-- [Write a better commit message](https://gist.github.com/MarcBresson/dd57a17f2ae60b6cb8688ee64cd7671d)
+- [Write a better commit message](https://github.com/MarcBresson/write-better-commit-messages)
 - [PEP 8 – Style Guide for Python Code](https://peps.python.org/pep-0008/)
 - [PEP 8 – Guidelines summary](https://github.com/MarcBresson/python-quick-guidelines)
 

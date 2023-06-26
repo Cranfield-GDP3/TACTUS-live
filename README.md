@@ -8,7 +8,18 @@
 - [PEP 8 – Style Guide for Python Code](https://peps.python.org/pep-0008/)
 - [PEP 8 – Guidelines summary](https://github.com/MarcBresson/python-quick-guidelines)
 
+## What can you use from this project
+
+As well as the model and the entire pipeline, you could find use for the following modules:
+
+- The skeleton class from `tactus data` allows the computation of individual keypoint speed, and more features.
+- The data augmentation techniques designed for skeletons.
+- The visualisation modules that takes a Skeleton object as an input.
+- The pytorch MLP class from `tactus model` that has a sklearn-like signature.
+
 ## How this project has been coded
+
+The choice of splitting the project into 3 repositories was made in the context of new-to-git developers. Indeed, by creating multiple repositories (thus multiple python packages), we limited the scope of the actions one developer could take.
 
 ### Tactus data
 
